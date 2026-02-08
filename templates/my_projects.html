@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}My Projects - Assanj Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-2">Total Projects</div>
+            <div class="text-3xl font-bold text-gray-900">{{ total_projects }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-2">New</div>
+            <div class="text-3xl font-bold text-blue-600">{{ new_projects }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-2">Assigned</div>
+            <div class="text-3xl font-bold text-yellow-600">{{ assigned_projects }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-2">In Progress</div>
+            <div class="text-3xl font-bold text-orange-600">{{ in_progress_projects }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-2">Completed</div>
+            <div class="text-3xl font-bold text-green-600">{{ completed_projects }}</div>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <a href="{% url 'clients:fetcher_add_client' %}" class="inline-block px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Add New Project</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-900">My Projects</h2>
+        </div>
+        {% if projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Project Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Current Stage</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Assigned Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for project in projects %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-gray-900">{{ project.client.business_name }}</div>
+                            <div class="text-xs text-gray-600">#{{ project.id }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-3 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">{{ project.get_current_stage_display }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-3 py-1 text-xs font-medium {% if project.status == 'new' %}bg-blue-100 text-blue-800{% elif project.status == 'assigned' %}bg-yellow-100 text-yellow-800{% elif project.status == 'in_progress' %}bg-orange-100 text-orange-800{% elif project.status == 'completed' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %} rounded-full">{{ project.get_status_display }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ project.date_assigned|date:"M d, Y"|default:"—" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                            <a href="{% url 'projects:admin_project_detail' project.pk %}" class="inline-block px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">View</a>
+                            <a href="{% url 'activity:activity_logs_project' project.pk %}" class="inline-block px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">Activity</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="px-6 py-12 text-center">
+            <svg class="mx-auto w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <p class="text-gray-500 font-medium">No projects created yet</p>
+            <a href="{% url 'clients:fetcher_add_client' %}" class="inline-block mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">Create Your First Project</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

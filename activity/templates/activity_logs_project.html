@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Activity Log - Project {{ project_id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-10">
+  <h1 class="text-2xl font-bold mb-4">Activity Log — Project #{{ project_id }}</h1>
+  <div class="bg-white rounded-lg border border-gray-100 p-6">
+    {% if logs %}
+    <br>
+      <ul class="divide-y divide-gray-200">
+        {% for log in logs %}
+        <li class="flex items-start space-x-4">
+          <div class="text-xs text-slate-400 w-32">{{ log.timestamp|date:"Y-m-d H:i" }}</div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold">{{ log.action|capfirst }}</div>
+            <div class="text-sm text-slate-600">By: {{ log.actor }}</div>
+            {% if log.note %}
+            <div class="mt-2 text-sm text-gray-800">{{ log.note }}</div>
+            {% endif %}
+          </div>
+        </li>
+        <br>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-500">No activity logs for this project.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

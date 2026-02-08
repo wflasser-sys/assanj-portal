@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Project #{{ project.id }} - Assanj Portal{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-6 py-10 font-inter text-gray-800">
+
+    <!-- Page Header -->
+    <div class="mb-10">
+        <div class="flex items-center justify-between gap-6">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Project #{{ project.id }}</h1>
+                <p class="text-xl text-gray-600">{{ project.client.business_name }}</p>
+                <span class="inline-block mt-4 px-4 py-1 text-sm font-semibold rounded-full bg-indigo-600 text-white shadow">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="bg-white rounded-lg border border-gray-100 px-4 py-3 text-sm">
+                    <div class="text-xs text-slate-500">Your Commission</div>
+                    <div class="font-semibold text-slate-800">₹{{ project.fetcher_commission_amount|default:0 }}</div>
+                </div>
+                <div>
+                    <a href="{% url 'activity:activity_logs_project' project.pk %}" class="text-sm text-indigo-600 hover:underline">View Activity</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Information Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Client Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-10 text-gray-700 text-base leading-relaxed">
+            <p><strong>Business Name:</strong> {{ project.client.business_name }}</p>
+            <p><strong>Contact Person:</strong> {{ project.client.full_name }}</p>
+            <p><strong>Phone:</strong> {{ project.client.phone }}</p>
+            <p><strong>Email:</strong> {{ project.client.email }}</p>
+            <p><strong>City:</strong> {{ project.client.city }}</p>
+            <p><strong>Category:</strong> {{ project.client.business_category }}</p>
+        </div>
+    </div>
+
+    <!-- Project Details Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Project Details</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-10 text-gray-700">
+            <p><strong>Project Type:</strong> {{ project.get_project_type_display }}</p>
+            <p><strong>Website Type:</strong> {{ project.get_website_type_display }}</p>
+            <p class="sm:col-span-2"><strong>Business Description:</strong> {{ project.business_description }}</p>
+            <p><strong>Deadline:</strong> {{ project.deadline }}</p>
+        </div>
+    </div>
+
+    <!-- Contact Information Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-10 text-gray-700">
+            <p><strong>Phone:</strong> {{ project.contact_info_phone }}</p>
+            <p><strong>Email:</strong> {{ project.contact_info_email }}</p>
+            <p><strong>Address:</strong> {{ project.contact_info_address }}</p>
+            {% if project.google_map_link %}
+            <p>
+                <strong>Google Map:</strong>
+                <a href="{{ project.google_map_link }}" target="_blank"
+                    class="text-indigo-600 hover:text-indigo-800 font-medium transition">
+                    View on Map
+                </a>
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Status Timeline Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Status Timeline</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-10 text-gray-700">
+            <p><strong>Date Created:</strong> {{ project.date_created|date:"Y-m-d H:i" }}</p>
+            {% if project.date_assigned %}
+            <p><strong>Date Assigned:</strong> {{ project.date_assigned|date:"Y-m-d H:i" }}</p>
+            {% endif %}
+            {% if project.date_completed %}
+            <p><strong>Date Completed:</strong> {{ project.date_completed|date:"Y-m-d H:i" }}</p>
+            {% endif %}
+            {% if project.assigned_to %}
+            <p><strong>Assigned Developer:</strong> {{ project.assigned_to.username }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Developer Output Card -->
+    {% if project.developer_mock_link or project.final_delivery_link %}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Developer Output</h2>
+        <div class="space-y-3 text-gray-700 text-base">
+            {% if project.developer_mock_link %}
+            <p><strong>Mock Design:</strong>
+                <a href="{{ project.developer_mock_link }}" target="_blank"
+                    class="text-indigo-600 hover:text-indigo-800 transition font-medium">
+                    View Mock
+                </a>
+            </p>
+            {% endif %}
+            {% if project.final_delivery_link %}
+            <p><strong>Final Website:</strong>
+                <a href="{{ project.final_delivery_link }}" target="_blank"
+                    class="text-indigo-600 hover:text-indigo-800 transition font-medium">
+                    Visit Website
+                </a>
+            </p>
+            {% endif %}
+            {% if project.developer_notes %}
+            <p><strong>Developer Notes:</strong> {{ project.developer_notes }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% comment %} <!-- Payouts Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Payouts</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-10 text-gray-700">
+            <p><strong>Fetcher Commission:</strong> {{ project.fetcher_commission_amount|default:"-" }}</p>
+            <p><strong>Developer Payout:</strong> {{ project.developer_payout_amount|default:"-" }}</p>
+            <p><strong>Agency Profit:</strong> {{ project.agency_profit|default:"-" }}</p>
+            <p><strong>Payment Released:</strong> {{ project.admin_payment_released|yesno:"Yes,No" }}</p>
+        </div>
+    </div> {% endcomment %}
+{% comment %} 
+    <!-- Actions Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-12">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Actions</h2>
+        <div class="flex flex-wrap gap-4">
+            {% if project.status == 'new' %}
+            <a href="{% url 'projects:admin_assign' project.pk %}"
+                class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-green-700 transition">
+                Assign Developer
+            </a>
+            {% endif %}
+            {% if project.status == 'completed' %}
+            <a href="{% url 'projects:admin_payment_release' project.pk %}"
+                class="inline-block bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-yellow-600 transition">
+                Release Payment
+            </a>
+            {% endif %}
+        </div>
+    </div> {% endcomment %}
+
+    <!-- Back Button -->
+    <div class="text-center">
+        <a href="{% url 'projects:fetcher_projects' %}"
+            class="inline-block bg-indigo-600 text-white px-10 py-3 text-lg rounded-lg font-semibold shadow hover:bg-indigo-700 transition">
+            Back to My Projects
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

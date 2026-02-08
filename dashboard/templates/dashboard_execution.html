@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-10">
+  <h1 class="text-3xl font-bold mb-8 text-white">Execution Dashboard</h1>
+  
+  <!-- Completed Projects Section -->
+  <div class="mb-10">
+    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+      <svg class="w-6 h-6 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+      </svg>
+      Completed Projects
+    </h2>
+    {% if completed_projects %}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3">Project Name</th>
+            <th class="px-4 py-3">Client</th>
+            <th class="px-4 py-3">Current Stage</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Completed Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in completed_projects %}
+          <tr class="border-t hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3"><a href="{% url 'projects:developer_project_detail' p.id %}" class="text-indigo-600 hover:underline font-medium">{{ p.client.business_name }}</a></td>
+            <td class="px-4 py-3">{{ p.client.phone_number }}</td>
+            <td class="px-4 py-3"><span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">{{ p.get_current_stage_display }}</span></td>
+            <td class="px-4 py-3"><span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">{{ p.get_status_display }}</span></td>
+            <td class="px-4 py-3">{{ p.date_completed|date:"M d, Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
+      <p class="text-gray-500 text-lg">No completed projects yet.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Currently Ongoing Projects Section -->
+  <div>
+    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+      <svg class="w-6 h-6 mr-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6-4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+      </svg>
+      Currently Going On Projects
+    </h2>
+    {% if ongoing_projects %}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3">Project Name</th>
+            <th class="px-4 py-3">Client</th>
+            <th class="px-4 py-3">Current Stage</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Assigned Date</th>
+            <th class="px-4 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in ongoing_projects %}
+          <tr class="border-t hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3"><a href="{% url 'projects:developer_project_detail' p.id %}" class="text-indigo-600 hover:underline font-medium">{{ p.client.business_name }}</a></td>
+            <td class="px-4 py-3">{{ p.client.phone_number }}</td>
+            <td class="px-4 py-3"><span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">{{ p.get_current_stage_display }}</span></td>
+            <td class="px-4 py-3"><span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">{{ p.get_status_display }}</span></td>
+            <td class="px-4 py-3">{{ p.date_assigned|date:"M d, Y" }}</td>
+            <td class="px-4 py-3">
+              <a href="{% url 'projects:developer_project_detail' p.id %}" class="inline-flex items-center px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                View Details
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
+      <p class="text-gray-500 text-lg">No ongoing projects.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}My Projects - Assanj Portal{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-6 py-10 font-inter text-gray-800">
+
+    <!-- Page Header -->
+    <div class="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">My Submitted Projects</h1>
+            <p class="text-gray-600">View and manage all your project submissions</p>
+        </div>
+        <a href="{% url 'clients:fetcher_add_client' %}"
+            class="inline-flex items-center justify-center bg-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-green-700 transition-all hover:shadow-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add New Client + Project
+        </a>
+    </div>
+
+    {% if projects %}
+    <!-- Projects Table Card -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Project Type</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Website Type</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Payment Status</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Date Created</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for project in projects %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{{ project.id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ project.client.business_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ project.get_project_type_display }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ project.get_website_type_display }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
+                                {% if project.status == 'new' %}bg-blue-100 text-blue-800
+                                {% elif project.status == 'assigned' %}bg-purple-100 text-purple-800
+                                {% elif project.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                {% elif project.status == 'completed' %}bg-green-100 text-green-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ project.get_payment_status_display }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ project.date_created|date:"Y-m-d" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <div class="flex items-center gap-3">
+                                <a href="{% url 'projects:fetcher_project_detail' project.pk %}"
+                                    class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    View Details
+                                </a>
+                                <a href="{% url 'activity:activity_logs_project' project.pk %}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">Activity</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+        <svg class="mx-auto h-24 w-24 text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-2xl font-semibold text-gray-900 mb-3">No Projects Yet</h3>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">You haven't submitted any projects yet. Get started by adding your first client and creating a project.</p>
+        <a href="{% url 'clients:fetcher_add_client' %}"
+            class="inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-all hover:shadow-lg">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Your First Client
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

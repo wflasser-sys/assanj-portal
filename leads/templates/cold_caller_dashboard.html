@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-10">
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-white">Cold Caller Dashboard</h1>
+    <div class="flex gap-3">
+      <div class="bg-white rounded-lg border border-gray-100 px-4 py-3 text-sm">
+        <div class="text-xs text-slate-500">Total Earned</div>
+        <div class="font-semibold text-white">₹{{ total_earned }}</div>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-100 px-4 py-3 text-sm">
+        <div class="text-xs text-slate-500">Pending</div>
+        <div class="font-semibold text-white">₹{{ pending }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-xl shadow p-6 border border-gray-200">
+        <h2 class="text-lg font-semibold mb-4">Add Lead</h2>
+        <form method="post" action="{% url 'leads:add_lead' %}" id="lead-add-form">
+          {% csrf_token %}
+          <div>
+            <label class="block text-sm font-medium mb-1">Business name</label>
+            {{ form.business_name }}
+          </div>
+          <div class="mt-3">
+            <label class="block text-sm font-medium mb-1">Phone</label>
+            {{ form.phone_number }}
+          </div>
+          <div class="mt-3">
+            <label class="block text-sm font-medium mb-1">Category</label>
+            {{ form.category }}
+          </div>
+          <div class="mt-3">
+            <label class="block text-sm font-medium mb-1">Other Category</label>
+            {{ form.other_category }}
+          </div>
+
+          <div class="mt-3">
+            <label class="block text-sm font-medium mb-1">Status</label>
+            {{ form.status }}
+          </div>
+
+          <div class="mt-3" id="meeting-details-group" style="display: none;">
+            <label class="block text-sm font-medium mb-1">Meeting Details</label>
+            {{ form.meeting_details }}
+            <p class="text-xs text-slate-400 mt-1">Enter meeting timing & any notes (visible to sales closer).</p>
+          </div>
+
+          <button type="submit" class="mt-3 w-full btn-primary">Add Lead</button>
+        </form>
+
+        <script>
+          // Toggle meeting details visibility if status == meeting_booked
+          (function(){
+            var statusEl = document.getElementById('id_status');
+            var detailsGroup = document.getElementById('meeting-details-group');
+            function toggle() {
+              if (!statusEl) return;
+              if (statusEl.value === 'meeting_booked') {
+                detailsGroup.style.display = 'block';
+              } else {
+                detailsGroup.style.display = 'none';
+              }
+            }
+            if (statusEl) {
+              statusEl.addEventListener('change', toggle);
+              document.addEventListener('DOMContentLoaded', toggle);
+              toggle();
+            }
+          })();
+        </script>
+      </div>
+    </div>
+    
+    <div class="lg:col-span-2">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Leads</h2>
+        <div class="flex gap-2">
+          {% if show_my_leads %}
+            <a href="{% url 'leads:cold_caller_dashboard' %}"
+                class="px-3 py-1 text-sm rounded-md bg-green-600 text-white hover:bg-green-700">
+              Show All Leads
+            </a>
+          {% else %}
+            <a href="?my_leads=1"
+               class="px-3 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">
+              My Leads
+            </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-6 border border-gray-200 overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-4 py-3">Business</th>
+              <th class="px-4 py-3">Phone</th>
+              <th class="px-4 py-3">Category</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Created</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            {% for lead in leads %}
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-4 py-3">{{ lead.business_name }}</td>
+              <td class="px-4 py-3">{{ lead.phone_number }}</td>
+              <td class="px-4 py-3">{{ lead.category }}{% if lead.other_category %} ({{ lead.other_category }}){% endif %}</td>
+              <td class="px-4 py-3">{{ lead.get_status_display }}</td>
+              <td class="px-4 py-3">{{ lead.created_at }}</td>
+              <td class="px-4 py-3">
+                {% load role_tags %}
+                {% if lead.created_by == request.user or request.user|has_role:"admin" or request.user|has_role:"project_manager" %}
+                  <a href="{% url 'leads:edit_lead' lead.id %}" class="inline-flex items-center px-3 py-1 text-sm btn-sm btn-accent rounded-md">Edit</a>
+                  <a href="{% url 'leads:delete_lead' lead.id %}" class="inline-flex items-center px-3 py-1 text-sm btn-sm btn-danger rounded-md ml-2">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">No leads yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

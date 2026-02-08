@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Assanj Portal{% endblock %}
+
+{% block content %}
+
+<!-- Agency Profit Summary -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Total Profit Card -->
+    <div class="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <p class="text-purple-100 text-sm font-medium uppercase tracking-wide mb-1">Total Agency Profit</p>
+                <h3 class="text-4xl font-bold">₹{{ total_profit|floatformat:0|default:"0" }}</h3>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex items-center text-purple-100 text-sm">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            From Released Payments
+        </div>
+    </div>
+
+    <!-- Pending Profit Card -->
+    <div class="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <p class="text-blue-100 text-sm font-medium uppercase tracking-wide mb-1">Pending Profit</p>
+                <h3 class="text-4xl font-bold">₹{{ pending_profit|floatformat:0|default:"0" }}</h3>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex items-center text-blue-100 text-sm">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            From Completed Projects
+        </div>
+    </div>
+</div>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-800 mb-2">Admin Dashboard</h1>
+    <p class="text-slate-600">Manage all projects and assignments</p>
+
+    <!-- Workflow Overview -->
+    <div class="mt-4 mb-4 bg-white rounded-lg border border-gray-100 p-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-3">Workflow Overview</h3>
+        <div class="flex items-center gap-10 ">
+            <div class="text-center">
+                <div class="text-xs text-slate-500">New</div>
+                <div class="font-semibold">{{ new_projects.count }}</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-slate-500">Assigned</div>
+                <div class="font-semibold">{{ assigned_projects.count }}</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-slate-500">In Progress</div>
+                <div class="font-semibold">{{ in_progress_projects.count }}</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-slate-500">Completed</div>
+                <div class="font-semibold">{{ completed_projects.count }}</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xs text-slate-500">Payment Done</div>
+                <div class="font-semibold">{{ payment_done_projects.count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads Overview -->
+    <div class="mt-6 bg-white rounded-lg border border-gray-100 p-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-3">Leads Overview</h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="bg-white rounded-md border p-3 text-center">
+                <div class="text-xs text-slate-500">New</div>
+                <div class="font-semibold text-slate-800">{{ leads_new.count }}</div>
+            </div>
+            <div class="bg-white rounded-md border p-3 text-center">
+                <div class="text-xs text-slate-500">Contacted</div>
+                <div class="font-semibold text-slate-800">{{ leads_contacted.count }}</div>
+            </div>
+            <div class="bg-white rounded-md border p-3 text-center">
+                <div class="text-xs text-slate-500">Meetings</div>
+                <div class="font-semibold text-slate-800">{{ leads_meetings.count }}</div>
+            </div>
+            <div class="bg-white rounded-md border p-3 text-center">
+                <div class="text-xs text-slate-500">Won</div>
+                <div class="font-semibold text-slate-800">{{ leads_won.count }}</div>
+            </div>
+            <div class="bg-white rounded-md border p-3 text-center">
+                <div class="text-xs text-slate-500">Lost</div>
+                <div class="font-semibold text-slate-800">{{ leads_lost.count }}</div>
+            </div>
+        </div>
+</div>
+
+<!-- New Projects -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            New Projects
+            <span class="ml-3 bg-white text-blue-700 text-sm font-semibold px-3 py-1 rounded-full">{{ new_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if new_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Project Name</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Current Stage</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Assigned Date</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in new_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">{{ project.client.business_name }}</span>
+                            <div class="text-xs text-slate-600">#{{ project.id }}</div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                {{ project.get_current_stage_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm text-slate-600">{{ project.date_assigned|date:"M d, Y"|default:"—" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">View</a>
+                                <a href="{% url 'activity:activity_logs_project' project.pk %}" class="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-indigo-600 text-sm font-medium rounded-lg transition-colors">Activity</a>
+                                <a href="{% url 'projects:admin_assign' project.pk %}" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">Assign</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No new projects</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Assigned Projects -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Assigned Projects
+            <span class="ml-3 bg-white text-yellow-700 text-sm font-semibold px-3 py-1 rounded-full">{{ assigned_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if assigned_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Project Name</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Current Stage</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Assigned Date</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in assigned_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">{{ project.client.business_name }}</span>
+                            <div class="text-xs text-slate-600">#{{ project.id }}</div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                {{ project.get_current_stage_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm text-slate-600">{{ project.date_assigned|date:"M d, Y"|default:"—" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                                View Details
+                            </a>
+                            <a href="{% url 'activity:activity_logs_project' project.pk %}" class="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-indigo-600 text-sm font-medium rounded-lg transition-colors">Activity</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No assigned projects</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- In Progress Projects -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            In Progress
+            <span class="ml-3 bg-white text-indigo-700 text-sm font-semibold px-3 py-1 rounded-full">{{ in_progress_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if in_progress_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Project Name</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Current Stage</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Assigned Date</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in in_progress_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">{{ project.client.business_name }}</span>
+                            <div class="text-xs text-slate-600">#{{ project.id }}</div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                {{ project.get_current_stage_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm text-slate-600">{{ project.date_assigned|date:"M d, Y"|default:"—" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No projects in progress</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Completed - Pending Payment -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Completed - Pending Payment
+            <span class="ml-3 bg-white text-green-700 text-sm font-semibold px-3 py-1 rounded-full">{{ completed_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if completed_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Project Name</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Current Stage</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Assigned Date</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in completed_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">{{ project.client.business_name }}</span>
+                            <div class="text-xs text-slate-600">#{{ project.id }}</div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                {{ project.get_current_stage_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm text-slate-600">{{ project.date_assigned|date:"M d, Y"|default:"—" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                                    View
+                                </a>
+                                <a href="{% url 'projects:admin_payment_release' project.pk %}" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                    Release Payment
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No projects pending payment</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Payment Done -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-slate-600 to-slate-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Payment Done
+            <span class="ml-3 bg-white text-slate-700 text-sm font-semibold px-3 py-1 rounded-full">{{ payment_done_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if payment_done_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">ID</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Client</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Fetcher Payout</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Developer Payout</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Agency Profit</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in payment_done_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">#{{ project.id }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="font-medium text-slate-800">{{ project.client.business_name }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm font-semibold text-green-600">₹{{ project.fetcher_commission_amount|default:"-" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm font-semibold text-blue-600">₹{{ project.developer_payout_amount|default:"-" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="text-sm font-semibold text-purple-600">₹{{ project.agency_profit|default:"-" }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No completed payments</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

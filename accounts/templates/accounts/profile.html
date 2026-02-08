@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto p-6 bg-white rounded-xl">
+  <h1 class="text-2xl font-semibold mb-4">Profile</h1>
+  <div class="space-y-3 text-slate-300">
+    <div><strong>Username:</strong> {{ user.username }}</div>
+    <div><strong>Email:</strong> {{ user.email }}</div>
+    <div><strong>Roles:</strong> {% if user_profile %}{{ user_profile.get_role_display }}{% else %}no-role{% endif %}</div>
+    <div class="mt-4">
+      <a href="{% url 'accounts:logout' %}" class="btn-danger">Logout</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

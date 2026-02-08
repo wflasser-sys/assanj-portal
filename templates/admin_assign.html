@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Developer - Project #{{ project.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-8">
+        <a href="{% url 'projects:admin_project_detail' project.pk %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium mb-4">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Back to Project
+        </a>
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">Assign Developer</h1>
+        <p class="text-slate-600">Assign a developer to Project #{{ project.id }}</p>
+    </div>
+
+    <!-- Project Info Card -->
+    <div class="bg-gradient-to-r from-blue-800 to-indigo-900 border border-indigo-700 rounded-xl p-6 mb-6 text-white">
+        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Project Information
+        </h3>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-slate-600 mb-1">Client</p>
+                <p class="font-semibold text-slate-800">{{ project.client.business_name }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-slate-600 mb-1">Project Type</p>
+                <p class="font-semibold text-slate-800">{{ project.get_project_type_display }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Form -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Assignment Details
+            </h2>
+        </div>
+
+        <form method="post" class="p-8">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Developer Selection -->
+                <div>
+                    <label for="id_assigned_to" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Assign to Developer <span class="text-red-500">*</span>
+                    </label>
+                    {{ assign_form.assigned_to }}
+                    {% if assign_form.assigned_to.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ assign_form.assigned_to.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-2 text-xs text-slate-500">Select a developer to work on this project</p>
+                </div>
+
+                <!-- Assigned Team -->
+                <div>
+                    <label for="id_assigned_team" class="block text-sm font-semibold text-slate-700 mb-2">Assigned Team</label>
+                    <select name="assigned_team" id="id_assigned_team" multiple class="w-full p-3 border rounded-lg">
+                        {% for user in assign_form.fields.assigned_team.queryset %}
+                        <option value="{{ user.id }}" {% if user in assign_form.initial.assigned_team %}selected{% endif %}>{{ user.username }} ({{ user.profile.roles.all|join:", " }})</option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-2 text-xs text-slate-500">Select additional team members (Designers, SEO, GBP, other developers).</p>
+                </div>
+
+                <!-- Payouts Section -->
+                <div class="pt-6 border-t border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Set Payouts (Optional)
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Fetcher Commission -->
+                        <div>
+                            <label for="id_fetcher_commission_amount" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Fetcher Commission
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="fetcher_commission_amount" id="id_fetcher_commission_amount" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.fetcher_commission_amount.value|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- Developer Payout -->
+                        <div>
+                            <label for="id_developer_payout_amount" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Developer Payout
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="developer_payout_amount" id="id_developer_payout_amount" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.developer_payout_amount.value|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- Agency Profit -->
+                        <div>
+                            <label for="id_agency_profit" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Agency Profit
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="agency_profit" id="id_agency_profit" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.agency_profit.value|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        <!-- Designer Payout -->
+                        <div>
+                            <label for="id_designer_payout_amount" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Designer Payout
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="designer_payout_amount" id="id_designer_payout_amount" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.designer_payout_amount.value|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- SEO Payout -->
+                        <div>
+                            <label for="id_seo_payout_amount" class="block text-sm font-semibold text-slate-700 mb-2">
+                                SEO Payout
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="seo_payout_amount" id="id_seo_payout_amount" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.seo_payout_amount.value|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- GBP Payout -->
+                        <div>
+                            <label for="id_gbp_payout_amount" class="block text-sm font-semibold text-slate-700 mb-2">
+                                GBP Payout
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="gbp_payout_amount" id="id_gbp_payout_amount" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.gbp_payout_amount.value|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        <!-- Social Media Payout -->
+                        <div>
+                            <label for="id_social_media_payout_amount" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Social Media Payout
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">₹</span>
+                                <input type="number" name="social_media_payout_amount" id="id_social_media_payout_amount" 
+                                       class="w-full pl-8 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       value="{{ assign_form.social_media_payout_amount.value|default:'' }}">
+                            </div>
+                        </div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    
+                    <p class="mt-3 text-xs text-slate-500">You can set payout amounts now or update them later</p>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-8 pt-6 border-t border-slate-200 flex space-x-4">
+                <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Assign Developer
+                    </span>
+                </button>
+                <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+    select:focus {
+        outline: none;
+        border-color: #eab308;
+        ring: 2px;
+        ring-color: #eab308;
+    }
+</style>
+{% endblock %}

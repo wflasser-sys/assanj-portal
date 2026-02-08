@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <div class="bg-white rounded-xl shadow p-6 border border-gray-200">
+    <h2 class="text-xl font-semibold text-white mb-4">Edit Lead</h2>
+    <form method="post" action="{% url 'leads:edit_lead' lead.id %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="mt-4 flex gap-3">
+        <button type="submit" class="px-4 py-2 btn-primary">Save</button>
+        <a href="{% url 'leads:cold_caller_dashboard' %}" class="px-4 py-2 btn-outline">Cancel</a>
+      </div>
+    </form>
+
+    <script>
+      // Show meeting_details input only when status == 'meeting_booked'
+      (function(){
+        var statusEl = document.getElementById('id_status');
+        var meetingEl = document.getElementById('id_meeting_details');
+        function toggle() {
+          if (!statusEl || !meetingEl) return;
+          var p = meetingEl.closest('p') || meetingEl.parentElement;
+          if (statusEl.value === 'meeting_booked') {
+            p.style.display = '';
+          } else {
+            p.style.display = 'none';
+          }
+        }
+        if (statusEl && meetingEl) {
+          statusEl.addEventListener('change', toggle);
+          document.addEventListener('DOMContentLoaded', toggle);
+          toggle();
+        }
+      })();
+    </script>
+  </div>
+</div>
+{% endblock %}

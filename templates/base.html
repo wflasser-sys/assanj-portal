@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Assanj Portal{% endblock %}</title>
+{% load static %}
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          bodyBg: '#0B0B0E',
+          navbarBg: '#111216',
+          primaryText: '#FFFFFF',
+          mutedText: '#B0B3C0',
+          ctaBlue: '#2FA4FF',
+          accentPurple: '#6A5CFF',
+          card: '#1A1C22',
+          borderColor: '#2A2D36',
+          hoverBlue: '#5BB9FF'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --body-bg: #0B0B0E;
+  --navbar-bg: #111216;
+  --primary-text: #FFFFFF;
+  --muted-text: #B0B3C0;
+  --cta-blue: #2FA4FF;
+  --accent-purple: #6A5CFF;
+  --card-bg: #1A1C22;
+  --border-color: #2A2D36;
+  --hover-blue: #5BB9FF;
+}
+
+/* Global base adjustments */
+html { background: var(--body-bg); color: var(--primary-text); }
+body { background: var(--body-bg); color: var(--primary-text); }
+
+/* Replace common white cards */
+.bg-white { background-color: var(--card-bg) !important; color: var(--primary-text) !important; }
+/* Map previous dark text classes to primary white text */
+.text-black, .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-slate-800, .text-slate-900 { color: var(--primary-text) !important; }
+.text-slate-500, .text-slate-600, .text-slate-700, .text-gray-500, .text-gray-400, .text-slate-400, .text-slate-300, .text-gray-300 { color: var(--muted-text) !important; }
+
+/* Borders */
+.border-gray-100, .border-gray-200, .border-slate-200 { border-color: var(--border-color) !important; }
+
+/* Header & nav */
+header, nav, footer { background: var(--navbar-bg) !important; border-color: var(--border-color) !important; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; }
+table thead th { background: rgba(255,255,255,0.02); color: var(--primary-text); padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+table tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--primary-text); }
+table tr:hover td { background: rgba(47,164,255,0.03); }
+
+/* Badges */
+.bg-blue-100, .bg-yellow-100, .bg-green-100, .bg-purple-100 { background: rgba(255,255,255,0.03) !important; color: var(--muted-text) !important; border: 1px solid var(--border-color) !important; }
+.inline-flex.px-2.py-1.text-xs.font-medium { background: rgba(106,92,255,0.12) !important; color: var(--accent-purple) !important; }
+
+/* Buttons */
+.bg-gradient-to-r, .bg-blue-600, .bg-indigo-600, .bg-green-600, .bg-yellow-500, .bg-slate-600, .bg-red-600 {
+  opacity: 0.95;
+}
+/* primary CTA mapping to brand blue */
+.bg-indigo-600, .bg-blue-600 { background-color: var(--cta-blue) !important; }
+.bg-indigo-700, .bg-blue-700 { background-color: #1E8FE0 !important; }
+.hover\:bg-indigo-700:hover, .hover\:from-blue-700:hover { box-shadow: 0 6px 30px rgba(47,164,255,0.12); }
+/* ensure text in colored buttons is readable */
+a[class*="bg-"], .btn-primary, .btn-accent, .btn-danger { color: white !important; }
+
+/* Button utility classes */
+.btn-primary { background: var(--cta-blue); color: white; padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0.5rem; font-weight: 600; display: inline-flex; align-items:center; justify-content:center; transition: all 0.18s ease; }
+.btn-primary:hover { background: var(--hover-blue); box-shadow: 0 8px 28px rgba(47,164,255,0.14); transform: translateY(-1px); }
+
+.btn-accent { background: rgba(106,92,255,0.95); color: white; padding: 0.35rem 0.65rem; border-radius: 0.375rem; font-weight: 600; }
+.btn-accent:hover { box-shadow: 0 8px 28px rgba(106,92,255,0.12); transform: translateY(-1px); }
+
+.btn-danger { background: #ef4444; color: white; padding: 0.35rem 0.65rem; border-radius: 0.375rem; font-weight: 600; }
+.btn-danger:hover { background: #dc2626; box-shadow: 0 8px 28px rgba(239,68,68,0.12); transform: translateY(-1px); }
+
+.btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--muted-text); padding: 0.35rem 0.65rem; border-radius: 0.375rem; }
+.btn-outline:hover { background: rgba(255,255,255,0.02); color: var(--primary-text); }
+
+.btn-sm { padding-left: 0.6rem; padding-right:0.6rem; padding-top:0.25rem; padding-bottom:0.25rem; font-size: 0.85rem; }
+
+/* subtle hover effect */
+a:hover, button:hover { outline: none; box-shadow: 0 0 8px rgba(47,164,255,0.08); }
+
+/* Inputs & forms */
+input[type="text"], input[type="email"], input[type="tel"], textarea, select {
+  background: #0F1114 !important;
+  color: var(--primary-text) !important;
+  border: 1px solid var(--border-color) !important;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(47,164,255,0.12) !important;
+  border-color: var(--cta-blue) !important;
+}
+
+/* Spacing: consistent card padding and heading margins */
+main .p-6, main .p-8, main .p-4 { padding: 1.5rem !important; }
+h1, h2, h3 { color: var(--primary-text); margin-bottom: 0.5rem; }
+
+@media (max-width: 640px) {
+  .max-w-7xl { padding-left: 1rem; padding-right: 1rem; }
+}
+
+/* Table wrapper for better visibility */
+.overflow-x-auto { border-radius: 0.75rem; overflow: auto; box-shadow: 0 8px 20px rgba(0,0,0,0.45); border: 1px solid var(--border-color); }
+
+/* Message variants */
+.message-success { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.12); color: #86efac; }
+.message-error { background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.12); color: #fca5a5; }
+.message-info { background: rgba(47,164,255,0.04); border-color: rgba(47,164,255,0.12); color: #9fd6ff; }
+
+/* Neon border and hover fixes to avoid white backgrounds and add clarity */
+:root { --neon-border: rgba(47,164,255,0.28); }
+
+/* Map common light hover utilities to a subtle blue-tint hover with neon boundary */
+.hover\:bg-slate-50:hover,
+.hover\:bg-slate-100:hover,
+.hover\:bg-indigo-900\/10:hover,
+.hover\:from-blue-700:hover,
+.hover\:bg-indigo-900\/10:hover {
+  background: rgba(47,164,255,0.03) !important;
+  box-shadow: 0 6px 30px rgba(47,164,255,0.12) !important;
+  border: 1px solid var(--neon-border) !important;
+  color: var(--primary-text) !important;
+}
+
+/* Slightly dim the white/very-light background utilities */
+.bg-white\/20 { background-color: rgba(255,255,255,0.03) !important; }
+.bg-slate-100, .bg-slate-50, .bg-gray-100 { background-color: rgba(255,255,255,0.02) !important; color: var(--primary-text) !important; border-color: var(--border-color) !important; }
+
+/* Card hover: keep dark background and show neon border */
+.bg-white.rounded-xl:hover, .rounded-xl.shadow-sm:hover, .card:hover {
+  box-shadow: 0 10px 30px rgba(47,164,255,0.12);
+  border-color: var(--neon-border) !important;
+  background-color: var(--card-bg) !important;
+}
+
+/* Stronger hover glow & neon border for links and buttons */
+a:hover, button:hover, .btn-primary:hover, .btn-accent:hover, .btn-danger:hover {
+  outline: none;
+  box-shadow: 0 0 12px rgba(47,164,255,0.18);
+  border: 1px solid var(--neon-border);
+}
+
+/* Make primary CTA more visible and consistent */
+.btn-primary { background: linear-gradient(90deg, var(--cta-blue) 0%, #1E8FE0 100%); color: #FFFFFF; }
+.btn-primary:hover { background: var(--hover-blue); box-shadow: 0 12px 40px rgba(47,164,255,0.18); transform: translateY(-1px); border:1px solid var(--neon-border); }
+
+/* Ensure inputs, selects, textareas and list items are readable on dark backgrounds */
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.35) !important; }
+input, textarea, select, .form-control, .list-item { color: var(--primary-text) !important; background: #0F1114 !important; border-color: var(--border-color) !important; }
+
+/* Prevent accidental white backgrounds from inline utilities: prefer subtle dark tints */
+.bg-white { background-color: var(--card-bg) !important; color: var(--primary-text) !important; }
+
+/* Normalize light border utilities to dark theme */
+.border-indigo-100, .border-green-100, .border-yellow-100, .border-gray-100, .border-gray-200, .border-slate-200 { border-color: var(--border-color) !important; }
+
+</style>
+</head>
+{% load static %}
+<body class="dark text-white bg-bodyBg min-h-screen">
+    
+    <!-- Header -->
+    <!-- Navigation (mobile top bar) -->
+    {% if user.is_authenticated %}
+    <nav class="bg-navbarBg shadow-sm border-b md:hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center space-x-3">
+                    <button id="mobile-menu-toggle" class="p-2 rounded-md text-slate-300 hover:text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
+                            <img src="{% static 'images/logo.webp' %}" alt="Logo" class="w-9 h-9 object-cover rounded-lg">
+                        </div>
+                        <a href="{% url 'dashboard:dashboard' %}" class="text-sm font-medium text-white">Assanj</a>
+                    </div>
+                </div>
+                <div>
+                    <a href="{% url 'accounts:logout' %}" class="px-3 py-2 text-sm bg-red-600 text-white rounded-md">Logout</a>
+                </div>
+            </div>
+
+            <!-- Mobile Dropdown (hidden by default) -->
+            <div id="mobile-menu" class="mt-2 hidden">
+                <div class="flex flex-col space-y-1 pb-4">
+                    <a href="{% url 'dashboard:dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Dashboard</a>
+                  {% if is_project_manager %}
+                  <a href="{% url 'leads:cold_caller_dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">All Leads</a>
+                  <a href="{% url 'leads:filter' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Lead Filter</a>
+                  <a href="{% url 'clients:fetcher_add_client' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Add Client</a>
+                  <a href="{% url 'activity:activity_logs' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Activity Logs</a>
+                  <a href="{% url 'dashboard:my_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">My Projects</a>
+                  <a href="/admin/auth/user/" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Users & Roles</a>
+                  {% endif %}
+                    <a href="{% url 'leads:cold_caller_dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">My Leads</a>
+                    <a href="{% url 'leads:filter' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Lead Filter</a>
+                    <a href="{% url 'leads:sales_closer_dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Deals Won</a>
+                    <a href="{% url 'projects:my_earnings' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Total Earnings</a>
+                    {% comment %} <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Profile</a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+                {% if is_sales_closer %}
+                <a href="{% url 'clients:fetcher_add_client' %}" class="inline-block px-3 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-lg transition-colors">
+                    Add Client
+                </a>
+                <a href="{% url 'projects:fetcher_projects' %}" class="inline-block px-3 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-lg transition-colors">
+                    My Projects
+                </a>
+                <a href="{% url 'clients:fetcher_clients' %}" class="inline-block px-3 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-lg transition-colors">
+                    My Clients
+                </a>
+                {% endif %}
+                {% if is_admin %}
+                <a href="{% url 'projects:admin_projects' %}" class="inline-block px-3 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-lg transition-colors">
+                    All Projects
+                </a>
+                
+                {% endif %}
+                {% if is_developer %}
+                <a href="{% url 'projects:developer_projects' %}" class="inline-block px-3 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-lg transition-colors">
+                    My Projects
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar (desktop) -->
+    <aside class="hidden md:fixed md:inset-y-0 md:left-0 md:w-64 md:flex md:flex-col md:py-6 bg-navbarBg border-r border-gray-800">
+        <div class="px-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
+                    <img src="{% static 'images/logo.webp' %}" alt="Logo" class="w-10 h-10 object-cover rounded-lg">
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">Assanj Portal</h2>
+                </div>
+            </div>
+        </div>
+        <nav class="mt-6 flex-1 px-2 space-y-1">
+            <a href="{% url 'dashboard:dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Dashboard</a>
+        {% if is_project_manager %}
+        <a href="{% url 'leads:filter' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Lead Filter</a>
+        <a href="{% url 'leads:cold_caller_dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">All Leads</a>
+        <a href="{% url 'clients:fetcher_add_client' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Add Client</a>
+        <a href="{% url 'activity:activity_logs' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Activity Logs</a>
+        <a href="/admin/auth/user/" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Users & Roles</a>
+        <a href="{% url 'dashboard:my_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">My Projects</a>
+        {% endif %}
+            {% if is_cold_caller %}
+            <a href="{% url 'leads:filter' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Lead Filter</a>
+            <a href="{% url 'projects:fetcher_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Won Deals Projects</a>
+            <a href="{% url 'projects:my_earnings' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Total Earnings</a>
+            <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Profile</a>
+            <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Logout</a>
+            {% endif %}
+
+            {% if is_sales_closer %}
+            <a href="{% url 'leads:sales_closer_dashboard' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Deals Closed</a>
+            <a href="{% url 'projects:admin_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">My Projects</a>
+            <a href="{% url 'projects:my_earnings' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Total Earnings</a>
+            <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Profile</a>
+            <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Logout</a>
+            {% endif %}
+
+            {% if is_admin %}
+            <a href="{% url 'projects:admin_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">All Projects</a>
+            <a href="{% url 'leads:filter' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Lead Filter</a>
+
+            <a href="{% url 'activity:activity_logs' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Activity Logs</a>
+            <a href="/admin/auth/user/" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Users & Roles</a>
+            <a href="{% url 'projects:admin_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">Admin Panel</a>
+            {% endif %}
+
+            {% if is_developer %}
+            <a href="{% url 'projects:developer_projects' %}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-indigo-900/10 hover:text-white rounded-md">My Projects</a>
+            {% endif %}
+        </nav>
+        <div class="px-6 mt-auto">
+            {% if user.is_authenticated %}
+            <div class="text-sm text-slate-300 mb-3">
+                <div class="font-semibold text-white">{{ user.username }}</div>
+                <div class="text-xs text-slate-400">{% if user_profile %}{{ user_profile.get_role_display }}{% else %}no-role{% endif %}</div>
+            </div>
+            <a href="{% url 'projects:my_earnings' %}" class="inline-block w-full text-center px-4 py-2 mb-2 bg-cta-blue text-black rounded-md font-medium">View Earnings</a>
+            <a href="{% url 'accounts:logout' %}" class="inline-block w-full text-center px-4 py-2 bg-red-600 text-white rounded-md font-medium">Logout</a>
+            {% endif %}
+        </div>
+    </aside>
+    {% endif %}
+
+    <!-- mobile menu JS and small utilities -->
+    <script>
+      (function(){
+        var btn = document.getElementById('mobile-menu-toggle');
+        var menu = document.getElementById('mobile-menu');
+        if (btn && menu) {
+          btn.addEventListener('click', function(){
+            if (menu.classList.contains('hidden')) {
+              menu.classList.remove('hidden');
+            } else {
+              menu.classList.add('hidden');
+            }
+          });
+        }
+      })();
+    </script>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        {% for message in messages %}
+        <div class="mb-4 p-4 rounded-lg border message-{{ message.tags }}">
+            <p class="text-sm font-medium">{{ message }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:ml-64">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navbarBg border-t mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-sm text-slate-400">© 2026 Assanj Web Agency. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

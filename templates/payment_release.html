@@ -1,0 +1,323 @@
+<!-- ============================================ -->
+<!-- PAYMENT_RELEASE.HTML -->
+<!-- ============================================ -->
+
+{% extends 'base.html' %}
+{% load role_tags %}
+
+{% block title %}Release Payment - Project #{{ project.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">Release Payment</h1>
+                <p class="text-slate-600">Project #{{ project.id }} - {{ project.client.business_name }}</p>
+            </div>
+            <span class="inline-flex px-4 py-2 text-sm font-semibold bg-green-100 text-green-800 rounded-full">
+                {{ project.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Payment Summary Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Payment Breakdown
+            </h2>
+        </div>
+        <div class="p-6">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-slate-200">
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-slate-600 uppercase">Recipient</th>
+                            <th class="text-left py-4 px-4 text-sm font-semibold text-slate-600 uppercase">Name</th>
+                            <th class="text-right py-4 px-4 text-sm font-semibold text-slate-600 uppercase">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr class="hover:bg-green-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">Fetcher Commission</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">{{ project.created_by.username }}</td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-green-600">
+                                    {% if project.fetcher_commission_amount %}₹{{ project.fetcher_commission_amount }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">Developer Payout</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">{{ project.assigned_to.username }}</td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-blue-600">
+                                    {% if project.developer_payout_amount %}₹{{ project.developer_payout_amount }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-purple-50 transition-colors bg-purple-50/50">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">Agency Profit</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">Assanj Web Agency</td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-purple-600">
+                                    {% if project.agency_profit %}₹{{ project.agency_profit }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <!-- Designer -->
+                        <tr class="hover:bg-pink-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM6 20v-2c0-1.657 1.343-3 3-3h6c1.657 0 3 1.343 3 3v2"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">Designer Payout</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">
+                                {% with designers=project.assigned_team.all|filter_role:"designer" %}
+                                    {% if designers %}
+                                        {% for u in designers %}{{ u.username }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% else %}
+                                        <span class="text-slate-400">Not Assigned</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-pink-600">
+                                    {% if project.designer_payout_amount %}₹{{ project.designer_payout_amount }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <!-- SEO -->
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">SEO Payout</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">
+                                {% with seos=project.assigned_team.all|filter_role:"seo" %}
+                                    {% if seos %}
+                                        {% for u in seos %}{{ u.username }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% else %}
+                                        <span class="text-slate-400">Not Assigned</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-amber-600">
+                                    {% if project.seo_payout_amount %}₹{{ project.seo_payout_amount }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <!-- GBP -->
+                        <tr class="hover:bg-teal-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM6 20v-2c0-1.657 1.343-3 3-3h6c1.657 0 3 1.343 3 3v2"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">GBP Payout</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">
+                                {% with gbps=project.assigned_team.all|filter_role:"gbp" %}
+                                    {% if gbps %}
+                                        {% for u in gbps %}{{ u.username }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% else %}
+                                        <span class="text-slate-400">Not Assigned</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-teal-600">
+                                    {% if project.gbp_payout_amount %}₹{{ project.gbp_payout_amount }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <!-- Social Media -->
+                        <tr class="hover:bg-cyan-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium text-slate-800">Social Media Payout</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-700">
+                                {% with socials=project.assigned_team.all|filter_role:"social_media" %}
+                                    {% if socials %}
+                                        {% for u in socials %}{{ u.username }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% else %}
+                                        <span class="text-slate-400">Not Assigned</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="py-4 px-4 text-right">
+                                <span class="text-lg font-bold text-cyan-600">
+                                    {% if project.social_media_payout_amount %}₹{{ project.social_media_payout_amount }}{% else %}<span class="text-slate-400 text-sm font-normal">Not Set</span>{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Delivery Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Project Delivery Details
+            </h2>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-slate-700 mb-1">Final Website</p>
+                    {% if project.final_delivery_link %}
+                        <a href="{{ project.final_delivery_link }}" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium flex items-center group">
+                            {{ project.final_delivery_link|truncatechars:50 }}
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </a>
+                    {% else %}
+                        <p class="text-slate-500">Not provided</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-start">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-slate-700 mb-1">Date Completed</p>
+                    <p class="text-slate-800 font-medium">{{ project.date_completed|date:"F d, Y - h:i A" }}</p>
+                </div>
+            </div>
+
+            {% if project.developer_notes %}
+            <div class="flex items-start pt-4 border-t border-slate-200">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-slate-700 mb-2">Developer Notes</p>
+                    <p class="text-slate-600 leading-relaxed">{{ project.developer_notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    {% if project.status == 'completed' and not project.admin_payment_released %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="bg-gradient-to-r from-green-800 to-green-700 border-2 border-green-700 rounded-xl p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Ready to Release Payment</h3>
+                        <p class="text-sm text-slate-600">This action will mark payments as released to all parties</p>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'projects:admin_project_detail' project.pk %}" class="px-6 py-3 btn-outline font-medium rounded-lg transition-colors">Cancel</a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Confirm & Release Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="bg-slate-100 border border-slate-200 rounded-xl p-6 text-center">
+        <svg class="w-16 h-16 mx-auto text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-lg font-semibold text-slate-700 mb-2">Payment Already Released</p>
+        <p class="text-slate-600 mb-4">This project's payment has been processed</p>
+        <a href="{% url 'projects:admin_projects' %}" class="inline-flex items-center px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            Back to Dashboard
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

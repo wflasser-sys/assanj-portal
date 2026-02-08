@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-10">
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-3xl font-bold text-slate-800">Client Dashboard</h1>
+    <a href="{% url 'projects:fetcher_projects' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">My Projects</a>
+  </div>
+
+  {% if projects %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for p in projects %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-lg transition">
+      <h3 class="text-lg font-semibold text-slate-800 mb-2">{{ p.client.business_name }}</h3>
+      <p class="text-sm text-gray-600 mb-1"><strong>Status:</strong> {{ p.get_current_stage_display }}</p>
+      <p class="text-sm text-gray-600 mb-1"><strong>Progress:</strong> {{ p.current_stage }}</p>
+      <p class="text-sm text-gray-600 mb-1"><strong>Payment:</strong> Total: {{ p.total_price }} | Paid: {% if p.payment_40_received %}40%{% endif %}{% if p.payment_60_received %} +60%{% endif %}</p>
+      <div class="mt-4">
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-3">
+            {% if p.developer_mock_link %}
+            <a href="{{ p.developer_mock_link }}" target="_blank" class="text-indigo-600 hover:underline text-sm">Preview</a>
+            {% endif %}
+            <a href="{% url 'projects:fetcher_project_detail' p.id %}" class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md text-sm hover:bg-slate-200">View Details</a>
+          </div>
+          <div class="text-sm text-slate-500">Last updated: {{ p.date_assigned|default:p.date_created }}</div>
+        </div>
+
+        <!-- Client-specific sections: Updates and Activity -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white border border-gray-100 rounded-md p-3">
+            <h4 class="text-sm font-semibold mb-2">Recent Updates</h4>
+            {% if p.recent_updates %}
+              {% for u in p.recent_updates %}
+                <div class="mb-2 text-sm text-slate-700">
+                  <div class="text-xs text-slate-500">{{ u.created_at }} by {{ u.user }}</div>
+                  <div>{{ u.message }}</div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-sm text-slate-500">No updates yet.</div>
+            {% endif %}
+          </div>
+
+          <div class="bg-white border border-gray-100 rounded-md p-3">
+            <h4 class="text-sm font-semibold mb-2">Activity Log</h4>
+            {% if p.recent_logs %}
+              {% for a in p.recent_logs %}
+                <div class="mb-2 text-sm text-slate-700">
+                  <div class="text-xs text-slate-500">{{ a.timestamp }} — {{ a.performed_by }}</div>
+                  <div>{{ a.action }} {% if a.note %}- {{ a.note }}{% endif %}</div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-sm text-slate-500">No activity recorded yet.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
+    <p class="text-gray-500">No projects found.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <div class="bg-white rounded-xl shadow p-6 border border-gray-200">
+    <h2 class="text-xl font-semibold text-white mb-4">Onboard Client</h2>
+    <p class="text-sm text-slate-400 mb-4">Create a client and a starter project. Payouts will be assigned by admin later.</p>
+    <form method="post" action="{% url 'leads:sales_closer_onboard' %}" class="grid grid-cols-1 gap-3">
+      {% csrf_token %}
+      <label class="block text-sm font-medium">Business name</label>
+      <input name="business_name" type="text" required class="w-full p-2 border rounded" />
+
+      <label class="block text-sm font-medium">Phone</label>
+      <input name="phone" type="text" required class="w-full p-2 border rounded" />
+
+      <label class="block text-sm font-medium">Email</label>
+      <input name="email" type="email" class="w-full p-2 border rounded" />
+
+      <label class="block text-sm font-medium">City</label>
+      <input name="city" type="text" class="w-full p-2 border rounded" />
+
+      <div class="text-right mt-3">
+        <button type="submit" class="px-4 py-2 btn-primary rounded">Onboard & Create Project</button>
+        <a href="{% url 'leads:sales_closer_dashboard' %}" class="px-4 py-2 btn-outline ml-2">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

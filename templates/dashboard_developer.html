@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block title %}Developer Dashboard - Assanj Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+<!-- Developer Earnings Summary -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Total Earnings Card -->
+    <div class="bg-gradient-to-br from-teal-600 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <p class="text-teal-100 text-sm font-medium uppercase tracking-wide mb-1">Total Earnings</p>
+                <h3 class="text-4xl font-bold">₹{{ total_earnings|floatformat:0|default:"0" }}</h3>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex items-center text-teal-100 text-sm">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Payment Received
+        </div>
+    </div>
+
+    <!-- Pending Earnings Card -->
+    <div class="bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <p class="text-yellow-100 text-sm font-medium uppercase tracking-wide mb-1">Pending Earnings</p>
+                <h3 class="text-4xl font-bold">₹{{ pending_earnings|floatformat:0|default:"0" }}</h3>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex items-center text-yellow-100 text-sm">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Awaiting Payment Release
+        </div>
+    </div>
+</div>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-800 mb-2">Developer Dashboard</h1>
+    <p class="text-slate-600">Track and manage your assigned projects</p>
+</div>
+
+<!-- Assigned Projects -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            Assigned Projects
+            <span class="ml-3 bg-white text-yellow-700 text-sm font-semibold px-3 py-1 rounded-full">{{ assigned_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if assigned_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">ID</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Client</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Project Type</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Website Type</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Deadline</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Your Payout</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in assigned_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">#{{ project.id }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-sm font-semibold text-yellow-700">{{ project.client.business_name|slice:":2"|upper }}</span>
+                                </div>
+                                <span class="font-medium text-slate-800">{{ project.client.business_name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                {{ project.get_project_type_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                {{ project.get_website_type_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-slate-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="text-sm text-slate-600">{{ project.deadline }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="text-sm font-semibold text-slate-800">₹{{ project.user_payout|default:"-" }}</div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'projects:developer_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">View</a>
+                                <a href="{% url 'activity:activity_logs_project' project.pk %}" class="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-indigo-600 text-sm font-medium rounded-lg transition-colors">Activity</a>
+                                <a href="{% url 'projects:developer_update_status' project.pk %}" class="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-colors">Update</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No new assigned projects</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- In Progress Projects -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+            In Progress
+            <span class="ml-3 bg-white text-blue-700 text-sm font-semibold px-3 py-1 rounded-full">{{ in_progress_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if in_progress_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">ID</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Client</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Mock Link</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in in_progress_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">#{{ project.id }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-sm font-semibold text-blue-700">{{ project.client.business_name|slice:":2"|upper }}</span>
+                                </div>
+                                <span class="font-medium text-slate-800">{{ project.client.business_name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+                                {{ project.get_project_type_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            {% if project.developer_mock_link %}
+                            <a href="{{ project.developer_mock_link }}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                View Mock
+                            </a>
+                            {% else %}
+                            <span class="text-slate-400 text-sm">No link yet</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'projects:developer_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                                    View
+                                </a>
+                                <a href="{% url 'projects:developer_update_status' project.pk %}" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                    Update
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No projects in progress</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Completed Projects -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Completed Projects
+            <span class="ml-3 bg-white text-green-700 text-sm font-semibold px-3 py-1 rounded-full">{{ completed_projects.count }}</span>
+        </h2>
+    </div>
+    <div class="p-6">
+        {% if completed_projects %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">ID</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Client</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Final Link</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Completed</th>
+                        <th class="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for project in completed_projects %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-4">
+                            <span class="font-semibold text-slate-800">#{{ project.id }}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-sm font-semibold text-green-700">{{ project.client.business_name|slice:":2"|upper }}</span>
+                                </div>
+                                <span class="font-medium text-slate-800">{{ project.client.business_name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-800 rounded-full">
+                                {{ project.get_project_type_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            {% if project.final_delivery_link %}
+                            <a href="{{ project.final_delivery_link }}" target="_blank" class="inline-flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                View Live
+                            </a>
+                            {% else %}
+                            <span class="text-slate-400 text-sm">No link</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-green-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="text-sm text-slate-600">{{ project.date_completed|date:"Y-m-d"|default:"-" }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <a href="{% url 'projects:developer_project_detail' project.pk %}" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-slate-500 font-medium">No completed projects</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
