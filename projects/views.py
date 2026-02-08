@@ -10,6 +10,9 @@ from django.urls import reverse
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from accounts.mixins import FetcherRequiredMixin, AdminRequiredMixin, DeveloperRequiredMixin, ProjectExecutionMixin, ProjectManagerRequiredMixin
 from clients.models import Client
 from .models import Project, ProjectUpdate
@@ -17,6 +20,7 @@ from .forms import ProjectForm, AdminAssignForm, DeveloperUpdateForm
 
 from django.db import transaction, models
 from activity.utils import log_activity
+from .cache_utils import invalidate_admin_cache, invalidate_user_fetcher_cache
 class CreateProjectView(FetcherRequiredMixin, CreateView):
     # Allow cold callers, sales closers, project managers and admins to create projects
     allowed_roles = ['cold_caller', 'sales_closer', 'project_manager', 'admin']
@@ -120,6 +124,10 @@ class CreateProjectView(FetcherRequiredMixin, CreateView):
 
         # Clear session
         del self.request.session['new_client_data']
+        
+        # Invalidate relevant caches
+        invalidate_admin_cache()
+        invalidate_user_fetcher_cache(self.request.user.id)
 
         messages.success(
             self.request,
@@ -181,36 +189,85 @@ class AdminProjectListView(ProjectManagerRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         projects = self.get_queryset()
 
-        context['new_projects'] = projects.filter(status='new')
-        context['assigned_projects'] = projects.filter(status='assigned')
-        context['in_progress_projects'] = projects.filter(status='in_progress')
-        context['completed_projects'] = projects.filter(status='completed')
-        context['payment_done_projects'] = projects.filter(
-            status='payment_done')
-        # Leads overview for admin
-        from leads.models import Lead
-        context['leads_new'] = Lead.objects.filter(status='new')
-        context['leads_contacted'] = Lead.objects.filter(status='contacted')
-        context['leads_meetings'] = Lead.objects.filter(status='meeting_booked')
-        context['leads_won'] = Lead.objects.filter(status='deal_won')
-        context['leads_lost'] = Lead.objects.filter(status='deal_lost')
+        # Cache project status counts - 5 minute cache
+        cache_key = 'admin_projects_status_counts'
+        cached_data = cache.get(cache_key)
         
-        # NEW: Calculate agency earnings
-        total_profit = projects.filter(
-            admin_payment_released=True
-        ).aggregate(
-            total=Sum('agency_profit')
-        )['total'] or 0
+        if cached_data:
+            context['new_projects'] = cached_data['new_projects']
+            context['assigned_projects'] = cached_data['assigned_projects']
+            context['in_progress_projects'] = cached_data['in_progress_projects']
+            context['completed_projects'] = cached_data['completed_projects']
+            context['payment_done_projects'] = cached_data['payment_done_projects']
+        else:
+            context['new_projects'] = projects.filter(status='new')
+            context['assigned_projects'] = projects.filter(status='assigned')
+            context['in_progress_projects'] = projects.filter(status='in_progress')
+            context['completed_projects'] = projects.filter(status='completed')
+            context['payment_done_projects'] = projects.filter(status='payment_done')
+            
+            cache.set(cache_key, {
+                'new_projects': context['new_projects'],
+                'assigned_projects': context['assigned_projects'],
+                'in_progress_projects': context['in_progress_projects'],
+                'completed_projects': context['completed_projects'],
+                'payment_done_projects': context['payment_done_projects'],
+            }, 300)  # 5 minutes
+
+        # Cache leads overview - 5 minute cache
+        cache_key_leads = 'admin_leads_overview'
+        cached_leads = cache.get(cache_key_leads)
         
-        pending_profit = projects.filter(
-            status='completed',
-            admin_payment_released=False
-        ).aggregate(
-            total=Sum('agency_profit')
-        )['total'] or 0
+        if cached_leads:
+            context['leads_new'] = cached_leads['leads_new']
+            context['leads_contacted'] = cached_leads['leads_contacted']
+            context['leads_meetings'] = cached_leads['leads_meetings']
+            context['leads_won'] = cached_leads['leads_won']
+            context['leads_lost'] = cached_leads['leads_lost']
+        else:
+            from leads.models import Lead
+            context['leads_new'] = Lead.objects.filter(status='new')
+            context['leads_contacted'] = Lead.objects.filter(status='contacted')
+            context['leads_meetings'] = Lead.objects.filter(status='meeting_booked')
+            context['leads_won'] = Lead.objects.filter(status='deal_won')
+            context['leads_lost'] = Lead.objects.filter(status='deal_lost')
+            
+            cache.set(cache_key_leads, {
+                'leads_new': context['leads_new'],
+                'leads_contacted': context['leads_contacted'],
+                'leads_meetings': context['leads_meetings'],
+                'leads_won': context['leads_won'],
+                'leads_lost': context['leads_lost'],
+            }, 300)  # 5 minutes
         
-        context['total_profit'] = total_profit
-        context['pending_profit'] = pending_profit
+        # Cache agency earnings calculations - 10 minute cache
+        cache_key_earnings = 'admin_agency_earnings'
+        cached_earnings = cache.get(cache_key_earnings)
+        
+        if cached_earnings:
+            context['total_profit'] = cached_earnings['total_profit']
+            context['pending_profit'] = cached_earnings['pending_profit']
+        else:
+            total_profit = projects.filter(
+                admin_payment_released=True
+            ).aggregate(
+                total=Sum('agency_profit')
+            )['total'] or 0
+            
+            pending_profit = projects.filter(
+                status='completed',
+                admin_payment_released=False
+            ).aggregate(
+                total=Sum('agency_profit')
+            )['total'] or 0
+            
+            context['total_profit'] = total_profit
+            context['pending_profit'] = pending_profit
+            
+            cache.set(cache_key_earnings, {
+                'total_profit': total_profit,
+                'pending_profit': pending_profit,
+            }, 600)  # 10 minutes
 
         return context
 
@@ -222,7 +279,18 @@ class AdminProjectDetailView(ProjectManagerRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['developers'] = User.objects.filter(profile__roles__name='developer')
+        
+        # Cache developers list - 30 minute cache
+        cache_key = 'admin_developers_list'
+        cached_developers = cache.get(cache_key)
+        
+        if cached_developers:
+            context['developers'] = cached_developers
+        else:
+            developers = User.objects.filter(profile__roles__name='developer')
+            context['developers'] = developers
+            cache.set(cache_key, developers, 1800)  # 30 minutes
+        
         # Prepare assigned_payments textarea initial
         payments_initial = ''
         try:
@@ -356,6 +424,11 @@ class AdminAssignDeveloperView(ProjectManagerRequiredMixin, View):
             project.save()
 
             log_activity('assign_developer', 'project', project.id, request.user)
+            
+            # Invalidate relevant caches
+            invalidate_admin_cache()
+            if project.created_by:
+                invalidate_user_fetcher_cache(project.created_by.id)
 
             messages.success(request, f'Project assigned to {developer.username}!')
             return redirect('projects:admin_project_detail', pk=project.pk)
@@ -384,6 +457,11 @@ class AdminPaymentReleaseView(ProjectManagerRequiredMixin, DetailView):
         project.status = 'payment_done'
         project.save()
         log_activity('mark_payment_released', 'project', project.id, request.user)
+        
+        # Invalidate relevant caches
+        invalidate_admin_cache()
+        if project.created_by:
+            invalidate_user_fetcher_cache(project.created_by.id)
 
         messages.success(request, 'Payment released successfully!')
         return redirect('projects:admin_projects')
@@ -411,6 +489,9 @@ class AdminAdvanceStageView(ProjectManagerRequiredMixin, View):
             project.status = 'completed'
         project.save()
         log_activity('advance_stage', 'project', project.id, request.user)
+        
+        # Invalidate relevant caches
+        invalidate_admin_cache()
 
         messages.success(request, f'Project advanced to {project.get_current_stage_display()}')
         return redirect('projects:admin_project_detail', pk=project.pk)
@@ -444,6 +525,9 @@ class AdminUpdateFinancialsView(ProjectManagerRequiredMixin, View):
         project.payment_60_received = payment_60
         project.save()
         log_activity('update_financials', 'project', project.id, request.user)
+        
+        # Invalidate relevant caches
+        invalidate_admin_cache()
 
         messages.success(request, 'Project financials updated.')
         return redirect('projects:admin_project_detail', pk=project.pk)
@@ -467,6 +551,10 @@ class AdminUpdatePreviewView(ProjectManagerRequiredMixin, View):
 
         project.save()
         log_activity('update_preview_links', 'project', project.id, request.user)
+        
+        # Invalidate relevant caches
+        invalidate_admin_cache()
+        
         messages.success(request, 'Preview links updated.')
         return redirect('projects:admin_project_detail', pk=project.pk)
 
@@ -503,6 +591,9 @@ class AdminRevertStageView(ProjectManagerRequiredMixin, View):
 
         # Log activity with note so it appears in project logs
         log_activity('revert_stage', 'project', project.id, request.user, note=message)
+        
+        # Invalidate relevant caches
+        invalidate_admin_cache()
 
         messages.success(request, f'Project reverted to {project.get_current_stage_display()}')
         return redirect('projects:admin_project_detail', pk=project.pk)

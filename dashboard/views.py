@@ -6,6 +6,7 @@ Redirects users to their appropriate dashboard based on role.
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.cache import cache
 
 
 @login_required
@@ -61,19 +62,32 @@ def fetcher_dashboard(request):
     projects = Project.objects.filter(created_by=request.user)
     clients = Client.objects.filter(created_by=request.user)
     
-    # Calculate earnings
-    total_earnings = projects.filter(
-        admin_payment_released=True
-    ).aggregate(
-        total=Sum('fetcher_commission_amount')
-    )['total'] or 0
+    # Cache earnings calculations - 5 minute cache per user
+    cache_key = f'fetcher_earnings_{request.user.id}'
+    cached_earnings = cache.get(cache_key)
     
-    pending_earnings = projects.filter(
-        status='completed',
-        admin_payment_released=False
-    ).aggregate(
-        total=Sum('fetcher_commission_amount')
-    )['total'] or 0
+    if cached_earnings:
+        total_earnings = cached_earnings['total_earnings']
+        pending_earnings = cached_earnings['pending_earnings']
+    else:
+        # Calculate earnings
+        total_earnings = projects.filter(
+            admin_payment_released=True
+        ).aggregate(
+            total=Sum('fetcher_commission_amount')
+        )['total'] or 0
+        
+        pending_earnings = projects.filter(
+            status='completed',
+            admin_payment_released=False
+        ).aggregate(
+            total=Sum('fetcher_commission_amount')
+        )['total'] or 0
+        
+        cache.set(cache_key, {
+            'total_earnings': total_earnings,
+            'pending_earnings': pending_earnings,
+        }, 300)  # 5 minutes
     
     context = {
         'total_projects': projects.count(),
@@ -102,12 +116,28 @@ def execution_dashboard(request):
     # Show only projects assigned to the current execution user
     from projects.models import Project
     user = request.user
-    projects = Project.objects.filter(assigned_team=user) | Project.objects.filter(assigned_to=user)
-    projects = projects.distinct()
     
-    # Separate completed and ongoing projects
-    completed_projects = projects.filter(status__in=['completed', 'payment_done']).order_by('-date_completed')
-    ongoing_projects = projects.filter(status__in=['new', 'assigned', 'in_progress']).order_by('-date_assigned')
+    # Cache execution projects per user - 3 minute cache
+    cache_key = f'execution_projects_{user.id}'
+    cached_data = cache.get(cache_key)
+    
+    if cached_data:
+        projects = cached_data['projects']
+        completed_projects = cached_data['completed_projects']
+        ongoing_projects = cached_data['ongoing_projects']
+    else:
+        projects = Project.objects.filter(assigned_team=user) | Project.objects.filter(assigned_to=user)
+        projects = projects.distinct()
+        
+        # Separate completed and ongoing projects
+        completed_projects = projects.filter(status__in=['completed', 'payment_done']).order_by('-date_completed')
+        ongoing_projects = projects.filter(status__in=['new', 'assigned', 'in_progress']).order_by('-date_assigned')
+        
+        cache.set(cache_key, {
+            'projects': projects,
+            'completed_projects': list(completed_projects),
+            'ongoing_projects': list(ongoing_projects),
+        }, 180)  # 3 minutes
     
     return render(request, 'dashboard_execution.html', {
         'projects': projects,
@@ -137,10 +167,27 @@ def client_dashboard(request):
 
     projects = Project.objects.filter(client=client)
 
-    # Attach recent updates and logs directly on project objects for easy templating
+    # Cache recent updates and logs per project - 2 minute cache
     for p in projects:
-        p.recent_updates = list(ProjectUpdate.objects.filter(project=p).order_by('-created_at')[:5])
-        p.recent_logs = list(ActivityLog.objects.filter(entity_type='project', entity_id=p.id).order_by('-timestamp')[:10])
+        # Cache key for each project's updates
+        cache_key_updates = f'project_{p.id}_updates'
+        cached_updates = cache.get(cache_key_updates)
+        
+        if cached_updates:
+            p.recent_updates = cached_updates
+        else:
+            p.recent_updates = list(ProjectUpdate.objects.filter(project=p).order_by('-created_at')[:5])
+            cache.set(cache_key_updates, p.recent_updates, 120)  # 2 minutes
+        
+        # Cache key for each project's logs
+        cache_key_logs = f'project_{p.id}_logs'
+        cached_logs = cache.get(cache_key_logs)
+        
+        if cached_logs:
+            p.recent_logs = cached_logs
+        else:
+            p.recent_logs = list(ActivityLog.objects.filter(entity_type='project', entity_id=p.id).order_by('-timestamp')[:10])
+            cache.set(cache_key_logs, p.recent_logs, 120)  # 2 minutes
 
     context = {
         'projects': projects,

@@ -9,8 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-temp-key")
-DEBUG = os.getenv("DEBUG", "False") == "True"
+SECRET_KEY = 'django-insecure-i0a%+%h6*!x8hb%&t9=7-5fj=wpymr2j5!q79zci!+w(3=b6-t'
+DEBUG = True  # Set to False in production, but True for development and testing
 
 
 ALLOWED_HOSTS = [
@@ -20,6 +20,16 @@ ALLOWED_HOSTS = [
 ]
 
 
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 
 # Application definition
@@ -95,11 +105,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / "static"]
-else:
-    STATICFILES_DIRS = []
-
+# Always include static folder, regardless of DEBUG mode
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic
 
 # Media files (uploads)
