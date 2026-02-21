@@ -2,18 +2,18 @@ import os
 from pathlib import Path
 import dj_database_url
 
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = True
 
 if not DEBUG:
     # Security settings for production
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    
+
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    
+
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-# SECRET_KEY = 'django-insecure-p44)5=jeh+e((^vfayi+&a!@4nususs6!!!d_23(z&7d*61&07'
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = 'django-insecure-p44)5=jeh+e((^vfayi+&a!@4nususs6!!!d_23(z&7d*61&07'
+# SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALLOWED_HOSTS = [
+    "assanjweb.pythonanywhere.com",
     "localhost",
     "127.0.0.1",
     ".railway.app",
@@ -137,3 +138,5 @@ LOGOUT_REDIRECT_URL = '/login/'
 CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
 ]
+
+    # adarSh@wwe26
